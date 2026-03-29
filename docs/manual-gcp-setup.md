@@ -68,7 +68,7 @@ Use location `US`.
 
 ## Step 6: Create base tables
 
-Run [01_create_objects.sql](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/sql/01_create_objects.sql) after replacing the project ID placeholder.
+Run [sql/01_create_objects.sql](../sql/01_create_objects.sql) after replacing the project ID placeholder.
 
 This creates:
 
@@ -82,8 +82,8 @@ This creates:
 If you want orchestration:
 
 1. Create a Composer environment in the same region.
-2. Upload [fraudshield_realtime_dag.py](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/orchestration/composer/fraudshield_realtime_dag.py).
-3. Upload the SQL files from [fraudshield/sql](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/sql).
+2. Upload [orchestration/composer/fraudshield_realtime_dag.py](../orchestration/composer/fraudshield_realtime_dag.py).
+3. Upload the SQL files from [sql](../sql).
 4. Add Airflow variables:
    - `fraudshield_project_id`
    - `fraudshield_dataset_location`
@@ -101,7 +101,7 @@ pip install -r .\fraudshield\requirements.txt
 ## Step 9: Run the Dataflow pipeline
 
 ```powershell
-python -m fraudshield.src.streaming.pipeline `
+python -m src.streaming.pipeline `
   --project_id=your-gcp-project-id `
   --region=us-central1 `
   --input_subscription=projects/your-gcp-project-id/subscriptions/fraud-transactions-sub `
@@ -117,7 +117,7 @@ python -m fraudshield.src.streaming.pipeline `
 ## Step 10: Publish sample transactions
 
 ```powershell
-python -m fraudshield.src.producer.transaction_events_producer `
+python -m src.producer.transaction_events_producer `
   --project_id=your-gcp-project-id `
   --topic_id=fraud-transactions `
   --event_count=500 `
@@ -128,7 +128,6 @@ python -m fraudshield.src.producer.transaction_events_producer `
 
 Run in order:
 
-1. [02_silver_transactions_curated.sql](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/sql/02_silver_transactions_curated.sql)
-2. [03_gold_risk_kpis.sql](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/sql/03_gold_risk_kpis.sql)
-3. [04_data_quality_checks.sql](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/sql/04_data_quality_checks.sql)
-
+1. [sql/02_silver_transactions_curated.sql](../sql/02_silver_transactions_curated.sql)
+2. [sql/03_gold_risk_kpis.sql](../sql/03_gold_risk_kpis.sql)
+3. [sql/04_data_quality_checks.sql](../sql/04_data_quality_checks.sql)

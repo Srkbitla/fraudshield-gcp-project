@@ -2,7 +2,7 @@ import json
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from fraudshield.src.streaming.transforms import (
+from src.streaming.transforms import (
     build_alert_row,
     build_metric_seed,
     normalize_event,

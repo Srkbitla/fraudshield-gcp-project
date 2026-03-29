@@ -10,12 +10,12 @@ from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions, 
 from apache_beam.transforms.window import FixedWindows
 from apache_beam.utils.timestamp import Timestamp
 
-from fraudshield.src.streaming.schemas import (
+from src.streaming.schemas import (
     FLAGGED_TRANSACTIONS_SCHEMA,
     RAW_TRANSACTIONS_SCHEMA,
     REALTIME_METRICS_SCHEMA,
 )
-from fraudshield.src.streaming.transforms import (
+from src.streaming.transforms import (
     build_alert_row,
     build_metric_seed,
     format_invalid_record,
@@ -225,4 +225,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -1,25 +1,32 @@
 # FraudShield: Real-Time Payment Fraud Detection Platform on GCP
 
-FraudShield is an interview-focused, end-to-end GCP Data Engineering project that simulates card payment transactions, processes them in real time, scores fraud risk with streaming rules, stores curated outputs in BigQuery, and orchestrates downstream reporting with Cloud Composer.
+Portfolio project for `GCP Data Engineering`, `stream processing`, and `fraud analytics`.
 
-## Why this project stands out
+FraudShield is an end-to-end real-time data platform that simulates payment authorization events, processes them through `Pub/Sub` and `Dataflow`, applies rule-based fraud scoring, writes flagged transactions and metrics to `BigQuery`, and orchestrates downstream analytical tables with `Cloud Composer`.
 
-- It solves a business problem that interviewers immediately understand: detecting suspicious transactions quickly enough to reduce fraud loss.
-- It demonstrates real-time data engineering using `Pub/Sub`, `Dataflow`, `BigQuery`, `Cloud Storage`, and `Cloud Composer`.
-- It gives you strong discussion points around schema validation, dead-letter handling, streaming deduplication, fraud rules, alerting, data quality, and cost optimization.
-- It lets you quantify impact in business language such as fraud exposure, alert volume, approval rate, and suspicious transaction share.
+## Why This Repo Is Worth Reviewing
 
-## Business scenario
+- Solves a business problem that is easy for interviewers and recruiters to understand.
+- Demonstrates real-time streaming, operational alerting, and analytical warehousing in one project.
+- Shows production-style patterns such as validation, dead-letter handling, deduplication, partitioning, clustering, and scheduled data quality checks.
+- Gives strong talking points around fraud scoring, merchant risk analysis, and country-level fraud hotspots.
 
-A digital payments company wants a streaming platform that can:
+## Project Snapshot
 
-- ingest payment authorization events in near real time,
-- identify suspicious transactions using rule-based scoring,
-- store flagged transactions for fraud operations review,
-- maintain analytics-ready fraud KPI tables for merchants and countries,
-- preserve invalid records for replay and troubleshooting.
+Business problem:
+A payments company needs to identify suspicious transactions quickly enough for operational review and risk monitoring.
 
-## End-to-end architecture
+What the pipeline does:
+
+- ingests payment events through `Pub/Sub`
+- validates and normalizes transactions in `Dataflow`
+- deduplicates records by `transaction_id`
+- assigns a rule-based `risk_score`, `risk_level`, and `risk_reasons`
+- writes high-risk transactions to an alerts table
+- builds `bronze`, `silver`, and `gold` fraud analytics tables in `BigQuery`
+- runs downstream KPI and DQ jobs with `Cloud Composer`
+
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -44,104 +51,92 @@ flowchart LR
     N --> F
 ```
 
-## Project structure
+## Tech Stack
 
-```text
-fraudshield/
-|-- README.md
-|-- config/
-|   `-- pipeline_config.example.json
-|-- docs/
-|   |-- architecture.md
-|   |-- interview-guide.md
-|   |-- manual-gcp-setup.md
-|   `-- resume-kit.md
-|-- orchestration/
-|   `-- composer/
-|       `-- fraudshield_realtime_dag.py
-|-- scripts/
-|   `-- gcloud/
-|       `-- setup_fraudshield.ps1
-|-- sql/
-|   |-- 01_create_objects.sql
-|   |-- 02_silver_transactions_curated.sql
-|   |-- 03_gold_risk_kpis.sql
-|   `-- 04_data_quality_checks.sql
-|-- src/
-|   |-- __init__.py
-|   |-- producer/
-|   |   `-- transaction_events_producer.py
-|   `-- streaming/
-|       |-- __init__.py
-|       |-- pipeline.py
-|       |-- schemas.py
-|       `-- transforms.py
-|-- tests/
-|   `-- test_transforms.py
-`-- requirements.txt
-```
+- `GCP`: Pub/Sub, Dataflow, BigQuery, Cloud Storage, Cloud Composer
+- `Languages`: Python, SQL, PowerShell
+- `Frameworks and Tools`: Apache Beam, Airflow, `gcloud` CLI
+- `Patterns`: streaming ETL, rule-based fraud scoring, operational alerting, bronze/silver/gold modeling
 
-## Core datasets and tables
+## What This Project Demonstrates
 
-- `bronze.payment_transactions`
-  Validated event-level transaction stream
-- `ops.flagged_transactions`
-  High-risk transactions emitted directly from the streaming pipeline
-- `ops.realtime_fraud_metrics`
-  One-minute fraud metrics for dashboards and operations
-- `silver.transactions_curated`
-  Curated transaction-level table with fraud risk breakdown
-- `gold.merchant_risk_hourly_kpis`
-  Merchant and category fraud KPIs
-- `gold.country_fraud_hotspots`
-  Country-level fraud concentration and decline trends
-- `ops.data_quality_audit`
-  Data quality audit log for warehouse checks
+- Real-time fraud-oriented stream processing on GCP
+- Rule-based risk scoring with explainable outcomes
+- Direct operational outputs for flagged transactions
+- One-minute fraud metrics for dashboards
+- Curated analytical models for merchant and geography-level reporting
+- Data quality auditing and replayable bad-record handling
 
-## Real-time fraud rules
+## Fraud Rules Used In Streaming
 
-FraudShield assigns a streaming `risk_score` and `risk_level` to each transaction using event attributes such as:
+- high-value transaction amount
+- cross-border usage
+- card-not-present activity
+- new device indicator
+- risky merchant category
+- declined transaction behavior
 
-- high transaction amount,
-- cross-border usage,
-- card-not-present transactions,
-- new device usage,
-- risky merchant categories,
-- rapid declines or suspicious approval patterns.
+These signals drive:
 
-This is intentionally rule-based so you can explain it clearly in interviews. You can later mention ML scoring as a production enhancement.
+- `risk_score`
+- `risk_level`
+- `risk_reasons`
 
-## How to run
+## Data Model
+
+| Layer | Table | Purpose |
+|---|---|---|
+| `bronze` | `payment_transactions` | validated transaction stream |
+| `ops` | `flagged_transactions` | high-risk transactions for review |
+| `ops` | `realtime_fraud_metrics` | one-minute fraud operations metrics |
+| `silver` | `transactions_curated` | curated transaction-level risk dataset |
+| `gold` | `merchant_risk_hourly_kpis` | merchant/category fraud KPIs |
+| `gold` | `country_fraud_hotspots` | country-level fraud concentration analysis |
+| `ops` | `data_quality_audit` | warehouse quality check results |
+
+## Business Metrics
+
+- suspicious transaction count
+- high-risk transaction share
+- approved amount
+- decline rate
+- merchant-level fraud concentration
+- country fraud hotspots
+- average risk score
+
+## Quick Start
 
 ### 1. Provision core resources
 
-Option A: automated setup via PowerShell and `gcloud`
+Option A: automated setup
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\fraudshield\scripts\gcloud\setup_fraudshield.ps1 `
+powershell -ExecutionPolicy Bypass -File .\scripts\gcloud\setup_fraudshield.ps1 `
   -ProjectId your-gcp-project-id `
   -Region us-central1 `
   -DatasetLocation US
 ```
 
-Option B: follow [manual-gcp-setup.md](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/docs/manual-gcp-setup.md)
+Option B: manual setup
 
-### 2. Create the base BigQuery objects
+- Follow [docs/manual-gcp-setup.md](docs/manual-gcp-setup.md)
 
-Run [01_create_objects.sql](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/sql/01_create_objects.sql) after replacing the project ID placeholder.
+### 2. Create base tables
+
+- Run [sql/01_create_objects.sql](sql/01_create_objects.sql) after replacing `your-gcp-project-id`
 
 ### 3. Install dependencies
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r .\fraudshield\requirements.txt
+pip install -r requirements.txt
 ```
 
-### 4. Start the streaming pipeline
+### 4. Run the streaming pipeline
 
 ```powershell
-python -m fraudshield.src.streaming.pipeline `
+python -m src.streaming.pipeline `
   --project_id=your-gcp-project-id `
   --region=us-central1 `
   --input_subscription=projects/your-gcp-project-id/subscriptions/fraud-transactions-sub `
@@ -157,31 +152,38 @@ python -m fraudshield.src.streaming.pipeline `
 ### 5. Publish sample transactions
 
 ```powershell
-python -m fraudshield.src.producer.transaction_events_producer `
+python -m src.producer.transaction_events_producer `
   --project_id=your-gcp-project-id `
   --topic_id=fraud-transactions `
   --event_count=500 `
   --sleep_seconds=0.3
 ```
 
-### 6. Build silver, gold, and quality checks
+### 6. Build curated layers
 
-Run the SQL files in order or deploy the Composer DAG from [fraudshield_realtime_dag.py](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/orchestration/composer/fraudshield_realtime_dag.py).
+- Run [sql/02_silver_transactions_curated.sql](sql/02_silver_transactions_curated.sql)
+- Run [sql/03_gold_risk_kpis.sql](sql/03_gold_risk_kpis.sql)
+- Run [sql/04_data_quality_checks.sql](sql/04_data_quality_checks.sql)
+- Or deploy [orchestration/composer/fraudshield_realtime_dag.py](orchestration/composer/fraudshield_realtime_dag.py)
 
-## Interview story
+## Key Files
 
-Tell the project in this sequence:
+- Streaming pipeline: [src/streaming/pipeline.py](src/streaming/pipeline.py)
+- Fraud logic: [src/streaming/transforms.py](src/streaming/transforms.py)
+- Event producer: [src/producer/transaction_events_producer.py](src/producer/transaction_events_producer.py)
+- Composer DAG: [orchestration/composer/fraudshield_realtime_dag.py](orchestration/composer/fraudshield_realtime_dag.py)
+- Architecture notes: [docs/architecture.md](docs/architecture.md)
+- Interview prep: [docs/interview-guide.md](docs/interview-guide.md)
+- Resume bullets: [docs/resume-kit.md](docs/resume-kit.md)
 
-1. Payment events enter through Pub/Sub in near real time.
-2. Dataflow validates, normalizes, deduplicates, and risk-scores transactions.
-3. High-risk events are written to an alerts table for fraud operations.
-4. Curated BigQuery models support merchant and geography-level fraud analytics.
-5. Composer schedules downstream KPI and data quality jobs.
-6. `gcloud` setup and manual documentation make the project easy to reproduce.
+## Interview Talking Points
 
-## Resume and interview assets
+- Why fraud detection is a strong real-time use case
+- Why `Dataflow` is a better fit than `Dataproc` here
+- How the pipeline separates operational alerts from analytical reporting
+- How rule-based scoring remains explainable and interview-friendly
+- What the next production step would be, such as velocity features or ML scoring
 
-- Resume bullets: [resume-kit.md](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/docs/resume-kit.md)
-- Architecture deep dive: [architecture.md](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/docs/architecture.md)
-- Mock interview Q&A: [interview-guide.md](/C:/Users/Srinivas%20Porandla/OneDrive/Documents/New%20project/fraudshield/docs/interview-guide.md)
+## Resume-Ready Summary
 
+Built a real-time fraud detection platform on `GCP` using `Pub/Sub`, `Dataflow`, `BigQuery`, `Cloud Composer`, and `Cloud Storage` to process payment transactions, assign rule-based fraud scores, generate flagged transaction alerts, and deliver merchant and country-level fraud analytics.
