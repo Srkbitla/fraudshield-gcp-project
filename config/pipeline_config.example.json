@@ -1,0 +1,12 @@
+{
+  "project_id": "your-gcp-project-id",
+  "region": "us-central1",
+  "input_subscription": "projects/your-gcp-project-id/subscriptions/fraud-transactions-sub",
+  "raw_table": "your-gcp-project-id:bronze.payment_transactions",
+  "alerts_table": "your-gcp-project-id:ops.flagged_transactions",
+  "metrics_table": "your-gcp-project-id:ops.realtime_fraud_metrics",
+  "dead_letter_path": "gs://your-gcp-project-id-fraudshield-raw/dead-letter/fraud-transactions",
+  "temp_location": "gs://your-gcp-project-id-fraudshield-temp/dataflow/temp",
+  "staging_location": "gs://your-gcp-project-id-fraudshield-temp/dataflow/staging",
+  "runner": "DataflowRunner"
+}
